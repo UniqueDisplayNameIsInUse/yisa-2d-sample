@@ -92,5 +92,5 @@ export namespace bttest {
 
             this.test.testSimpleAction(dt);
         }
-    }    
+    }
 }

@@ -1,3 +1,5 @@
+import { math } from "cc";
+
 export namespace bt {
 
     /**
@@ -149,7 +151,18 @@ export namespace bt {
     export abstract class Decorator extends ControllNode {
 
     }
-    
+
+    /**
+     * 随机选择器
+     */
+    export class RandomSelector extends ControllNode {
+
+        execute(dt: number, result: ExecuteResult) {
+            markFail(result);
+            let selectedChild = this.children[math.randomRangeInt(0, this.children.length)];
+            selectedChild.execute(dt, result);
+        }
+    }
 
     /**
      * 等待一定时间
@@ -183,10 +196,22 @@ export namespace bt {
     }
 
     /**
-     * AI 的黑板
+     * AI 的黑板     
      */
-    export abstract class Blackboard {
+    export class Blackboard {
+        data: Map<string, any> = new Map();
 
+        has(name: string): boolean {
+            return this.data.has(name)
+        }
+
+        add(name: string, val: any) {
+            this.data.set(name, val)
+        }
+
+        remove(name: string) {
+            this.data.delete(name);
+        }
     }
 
     /**

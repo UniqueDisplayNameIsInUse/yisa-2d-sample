@@ -1,6 +1,5 @@
 import { Vec3, v3, Component, _decorator, geometry, PhysicsSystem, Node, assert, find, random, math, Camera, debug } from "cc";
 import { mathu } from "../util/MathUtil";
-import { phyutil } from "../util/PhyUtil";
 import { bt } from "./BehaviourTree";
 const { property, ccclass } = _decorator;
 
@@ -30,13 +29,7 @@ export namespace vbttest {
                 math.EPSILON);
 
             if (isReachLastPatrolEnd) {
-                let radNormal = v3(random(), 0, random());
-                radNormal.normalize();
-
-                Vec3.scaleAndAdd(blackboard.patrolEnd, blackboard.startPosition,
-                    radNormal, blackboard.patrolRadius);
                 bt.markSuccess(result);
-                console.log(blackboard.patrolEnd);
                 return;
             }
 
@@ -52,19 +45,19 @@ export namespace vbttest {
         }
     }
 
-    class ChaseTarget extends bt.Action{
+    class ChaseTarget extends bt.Action {
         execute(dt: number, result: bt.ExecuteResult) {
             bt.markFail(result);
 
             assert(result.personalBlackboard instanceof PersonalBlackboard);
             let blackboard: PersonalBlackboard = result.personalBlackboard as PersonalBlackboard;
 
-            if(blackboard.target == null){
+            if (blackboard.target == null) {
                 return;
             }
             let d = Vec3.distance(blackboard.target.worldPosition, blackboard.selfEntity.worldPosition);
 
-            if( d < blackboard.attackRange ) {
+            if (d < blackboard.attackRange) {
                 bt.markSuccess(result);
                 return;
             }
@@ -119,6 +112,26 @@ export namespace vbttest {
             console.log('attack running')
         }
     }
+
+    class RecalulatePatrolEnd extends bt.Action {
+        execute(dt: number, result: bt.ExecuteResult) {
+            console.log('recalculate patrol end');
+            bt.markFail(result);
+
+            assert(result.personalBlackboard instanceof PersonalBlackboard);
+            let blackboard: PersonalBlackboard = result.personalBlackboard as PersonalBlackboard;
+
+            let radNormal = v3(random(), 0, random());
+            radNormal.normalize();
+            Vec3.scaleAndAdd(blackboard.patrolEnd, blackboard.startPosition,
+                radNormal, blackboard.patrolRadius);
+            console.log(blackboard.patrolEnd);
+
+            bt.markSuccess(result);
+        }
+
+    }
+
     //#endregion
 
     //#region 
@@ -131,7 +144,7 @@ export namespace vbttest {
     }
 
     // 丢失目标
-    class LostTarget extends bt.Condition{
+    class LostTarget extends bt.Condition {
         isSatisfy(result: bt.ExecuteResult): boolean {
             return (result.personalBlackboard as PersonalBlackboard).target == null;
         }
@@ -154,6 +167,12 @@ export namespace vbttest {
             blackboard.selfEntity = this.target;
             blackboard.startPosition = this.node.worldPosition.clone();
 
+            let radNormal = v3(random(), 0, random());
+            radNormal.normalize();
+            Vec3.scaleAndAdd(blackboard.patrolEnd, blackboard.startPosition,
+                radNormal, blackboard.patrolRadius);
+            console.log(blackboard.patrolEnd);
+
             this.testTree.result.personalBlackboard = blackboard;
             let root = new bt.Fallback();;
             this.testTree.root = root;
@@ -169,18 +188,12 @@ export namespace vbttest {
             wait.waitDuration = 3;
             patrol.addChild(wait);
 
-            // let chase = new bt.Sequence();
-
-            // let hast = new HasTarget();
-            // chase.addChild(hast);
-
-            // let c = new ChaseTarget();
-            // chase.addChild(c);
-
+            let repatrol = new RecalulatePatrolEnd();
+            patrol.addChild(repatrol);
         }
 
         update(dt: number) {
             this.testTree.update(dt);
-        }        
+        }
     }
 }

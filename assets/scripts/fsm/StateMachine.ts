@@ -37,7 +37,7 @@ export class StateMachine<TKey>{
 
         if (this._curStateKey != null) {
             if (!this.canTransitTo(this._curStateKey, key)) {
-                this.w("transit from: [", this._curStateKey, "] to [", key, "] is not allowed");
+                this.w("[StateMachine] transit from: [", this._curStateKey, "] to [", key, "] is not allowed");
                 return;
             }
             let currState = this.states.get(this._curStateKey);
