@@ -3,8 +3,9 @@ const { ccclass, property } = _decorator;
 
 @ccclass('MapEvent')
 export class MapEvent extends Component {
-    start() {
 
+    start() {
+        
     }
 
     update(deltaTime: number) {

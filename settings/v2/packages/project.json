@@ -1,0 +1,30 @@
+{
+  "layer": [
+    {
+      "name": "UI_Game",
+      "value": 1
+    }
+  ],
+  "physics": {
+    "collisionGroups": [
+      {
+        "index": 1,
+        "name": "PLAYER"
+      },
+      {
+        "index": 2,
+        "name": "ENEMY"
+      },
+      {
+        "index": 3,
+        "name": "PROJECTILE"
+      }
+    ],
+    "collisionMatrix": {
+      "0": 1,
+      "1": 0,
+      "2": 0,
+      "3": 0
+    }
+  }
+}
