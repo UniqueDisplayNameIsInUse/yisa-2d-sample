@@ -27,9 +27,8 @@ export namespace bt {
         result.executeState = ExecuteState.Fail;
     }
 
-    export function markRunning(result: ExecuteResult, runningNode: BtNode) {
+    export function markRunning(result: ExecuteResult) {
         result.executeState = ExecuteState.Running;
-        result.runningNode = runningNode;
     }
 
     export function markSuccess(result: ExecuteResult) {
@@ -41,9 +40,10 @@ export namespace bt {
      */
     export class ExecuteResult {
         executeState: ExecuteState = ExecuteState.Fail;
-        runningNode: BtNode;
-        globalBlackboard: Blackboard;
-        personalBlackboard: Blackboard;
+        blackboard: Blackboard;
+        constructor() {
+            this.blackboard = new Blackboard();
+        }
     }
 
     /**
@@ -82,8 +82,7 @@ export namespace bt {
      */
     export abstract class ControllNode implements BtNode {
         children: Array<BtNode> = [];
-        abstract execute(dt: number, result: ExecuteResult)
-
+        abstract execute(dt: number, result: ExecuteResult);
         addChild(child: BtNode) {
             this.children.push(child);
         }
@@ -148,19 +147,36 @@ export namespace bt {
     /**
      * 装饰器
      */
-    export abstract class Decorator extends ControllNode {
-
+    export abstract class Decorator implements BtNode {
+        child: BtNode = null;
+        execute(dt: number, result: ExecuteResult) {
+            this.child?.execute(dt, result);
+            this.decroateResult(result);
+        }
+        abstract decroateResult(result: ExecuteResult);
     }
 
     /**
      * 随机选择器
      */
     export class RandomSelector extends ControllNode {
-
         execute(dt: number, result: ExecuteResult) {
             markFail(result);
             let selectedChild = this.children[math.randomRangeInt(0, this.children.length)];
             selectedChild.execute(dt, result);
+        }
+    }
+
+    /**
+     * 翻转节点的结果
+     */
+    export class InvertResultDecorator extends Decorator {
+        decroateResult(result: ExecuteResult) {
+            if (result.executeState == ExecuteState.Fail) {
+                result.executeState = ExecuteState.Success;
+            } else if (result.executeState == ExecuteState.Success) {
+                result.executeState = ExecuteState.Fail;
+            }
         }
     }
 
@@ -179,21 +195,20 @@ export namespace bt {
             if (!this.start) {
                 this.start = true;
                 this.interval = 0;
-                console.log('start wait');
             }
 
             this.interval += dt;
             if (this.interval < this.waitDuration) {
-                markRunning(result, this);
+                markRunning(result);
                 return;
             }
 
-            console.log('start waitOver');
             this.interval = 0;
             this.start = false;
             markSuccess(result);
         }
     }
+
 
     /**
      * AI 的黑板     
@@ -209,6 +224,13 @@ export namespace bt {
             this.data.set(name, val)
         }
 
+        get(name: string): any {
+            if (!this.has(name)) {
+                return null;
+            }
+            return this.data.get(name)
+        }
+
         remove(name: string) {
             this.data.delete(name);
         }
@@ -222,18 +244,28 @@ export namespace bt {
         root: BtNode
         result: ExecuteResult = new ExecuteResult();
 
+        setBlackboard(bb: Blackboard) {
+            this.result.blackboard = bb;
+        }
+
+        addData(name: string, value: any) {
+            this.result.blackboard.add(name, value);
+        }
+
+        getData(name: string): any {
+            return this.result.blackboard.get(name);
+        }
+
+        removeData(name: string) {
+            this.result.blackboard.remove(name);
+        }
+
+        hasData(name: string): boolean {
+            return this.result.blackboard.has(name);
+        }
+
         update(dt: number) {
-
-            // if (this.result.runningNode) {
-            //     this.result.runningNode.execute(dt, this.result);
-            //     return;
-            // }
-
-            // if (this.result.executeState != ExecuteState.Running) {
-            //     this.result.runningNode = null;
-            // }
-
-            this.root.execute(dt, this.result);
+            this.root?.execute(dt, this.result);
         }
     }
 }
