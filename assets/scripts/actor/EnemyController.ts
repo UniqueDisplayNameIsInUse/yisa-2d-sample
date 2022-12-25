@@ -8,7 +8,7 @@ export class EnemyController extends Component {
     }
 
     update(deltaTime: number) {
-        
+
     }
 }
 
