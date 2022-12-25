@@ -1,6 +1,8 @@
-export class ActorProperty{
-    hp : number = 0;
-    maxHp : number = 0;    
+import { skill } from "./Skill";
 
-    projectileId : number = 0;
+export class ActorProperty {
+    hp: number = 0;
+    maxHp: number = 0;
+
+    skills: Array<skill.Skill> = [];
 }

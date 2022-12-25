@@ -8,6 +8,7 @@ export namespace skill {
 
     export class SkillDefine {
         id: skillId;
+
     }
 
     export class Active extends Skill {

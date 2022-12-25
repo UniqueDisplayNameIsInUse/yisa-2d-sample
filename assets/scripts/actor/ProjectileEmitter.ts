@@ -18,7 +18,7 @@ export class ProjectileEmitter extends Component {
 
         this.projectilePool = new Pool((): Node => {
             let projectile = instantiate(this.projectilePrefab!);
-            director.getScene().addChild(projectile);
+            director.getScene().addChild(projectile); 9
             projectile.active = false;
             return projectile;
         }, 10, (node: Node) => {
@@ -27,14 +27,12 @@ export class ProjectileEmitter extends Component {
 
     }
 
-    update(deltaTime: number) {
-
-    }
-
     getProjectile(): Node {
         let node = this.projectilePool.alloc();
 
         return node;
     }
+
+
 }
 
