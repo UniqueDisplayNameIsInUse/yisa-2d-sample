@@ -19,4 +19,5 @@ export class Idle extends ActorState implements State{
     onDestory(): void {
         
     }
+    
 } 

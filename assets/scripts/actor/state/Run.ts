@@ -5,7 +5,9 @@ import { ActorState } from "./ActorState";
 export class Run extends ActorState implements State{
  
     onEnter(...args: any): void {
-        super.animation.play(StateDefine.Run);
+        this.animation.play(StateDefine.Run);
     }
     
+    onUpdate(deltaTime: number): void {        
+    }
 }

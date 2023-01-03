@@ -233,9 +233,10 @@
     "name": "horizontal",
     "type": 1,
     "hardWareType": 1,
-    "positive": 65,
-    "nagetiveKey": 68,
-    "sensitiviy": 0.01,
+    "positive": 68,
+    "nagetiveKey": 65,
+    "mouseButton": 0,
+    "sensitiviy": 0.1,
     "damping": 0.001
   },
   {
@@ -245,7 +246,8 @@
     "hardWareType": 1,
     "positive": 87,
     "nagetiveKey": 83,
-    "sensitiviy": 0.01,
+    "mouseButton": 0,
+    "sensitiviy": 0.1,
     "damping": 0.001
   },
   {

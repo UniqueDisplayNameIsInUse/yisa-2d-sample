@@ -3,32 +3,32 @@ import { Actor } from "./Actor"
 export namespace combat {
 
     export enum CombatStageDefine {
-        BeforeHit,
+        BeforeHit = 0,
         AfterHit,
         SettleHit,
+        MaxStageSize,
     }
 
-    export class CombatStage {
-        calculate(pair: CombatPair) {
-
-        }
+    export interface CombatStage {
+        calculate?(pair: CombatResult)
     }
 
-    export class CombatPair {
+    export class CombatResult {
         src: Actor;
         dest: Actor;
+        damage: number;
     }
 
     export class Combat {
 
-        combatStages: Array<CombatStage> = [];
+        combatStages: Array<CombatStage> = new Array[CombatStageDefine.MaxStageSize];
 
-        addStage(stage: CombatStage) {
-
+        addStage(define: CombatStageDefine, stage: CombatStage) {
+            this.combatStages[define] = stage;
         }
 
-        calculate(src: Actor, dest: Actor): CombatPair {
-            let combatPair = new CombatPair();
+        calculate(src: Actor, dest: Actor): CombatResult {
+            let combatPair = new CombatResult();
             combatPair.src = src;
             combatPair.dest = dest;
 

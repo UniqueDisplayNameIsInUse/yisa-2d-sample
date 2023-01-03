@@ -29,6 +29,13 @@ export class StateMachine<TKey>{
     }
 
     transitTo(key: TKey, ...arg: any) {
+
+        let newState = this.states.get(key);
+        if (!newState) {
+            this.w('[StateMachine] missing key: ', key);
+            return;
+        }
+
         if (key == this._curStateKey) {
             if (!this._allowSameTransit) {
                 return;
@@ -41,13 +48,16 @@ export class StateMachine<TKey>{
                 return;
             }
             let currState = this.states.get(this._curStateKey);
-            currState.onExit(...arg);
+            if (currState && currState.onExit) {
+                currState.onExit(...arg);
+            }
         }
 
         this._curStateKey = key;
         this.l("transite:[", key, "] success.");
-        let newState = this.states.get(key);
-        newState.onEnter(...arg);
+        if(newState.onEnter){
+            newState.onEnter(...arg);
+        }        
     }
 
     onUpdate(deltaTime: number) {

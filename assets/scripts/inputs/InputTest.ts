@@ -6,16 +6,12 @@ const { ccclass, property, requireComponent } = _decorator;
 @requireComponent(HardwareInputs)
 export class InputTest extends Component {
 
-    hi: HardwareInputs;
-
-    start() {
-        this.hi = this.node.getComponent(HardwareInputs);
+    start() {        
     }
 
     update(dt: number) {
         const name = 'horizontal';
-        //console.log(name, this.hi.getKey(name), this.hi.getKeyDown(name), this.hi.getKeyUp(name), this.hi.getValue(name));
-        
+        console.log(name, HardwareInputs.getKey(name), HardwareInputs.getKeyDown(name), HardwareInputs.getKeyUp(name), HardwareInputs.getValue(name));        
     }
 
 }

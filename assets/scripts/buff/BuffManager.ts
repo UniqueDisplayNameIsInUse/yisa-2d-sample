@@ -1,4 +1,7 @@
+import { Component, _decorator } from "cc";
 import { ActorProperty } from "../actor/ActorProperty";
+import { Actor } from "../actor/Actor";
+const { ccclass, property, requireComponent } = _decorator;
 
 export namespace buff {
 
@@ -21,20 +24,48 @@ export namespace buff {
     export class Buff {
         id: buffId = 0;
         castTime: number = 0;
+        define: BuffDefine | null = null;
+        src: Actor | null = null;
+
+        onAdd() {
+
+        }
+
+        onRemoved() {
+
+        }
+
+        onUpdate(dt: number) {
+
+        }
     }
 
-    export class BuffManager {
+    @ccclass("BuffManager")
+    @requireComponent(Actor)
+    export class BuffManager extends Component {
 
         buffs: Array<Buff> = [];
 
         actorProperty: ActorProperty | null = null;
 
-        addBuff(buff: Buff) {
+        actor: Actor = null;
 
-            this.buffs.push(buff);
+        start() {
+            this.actor = this.node.getComponent(Actor);
+        }
+
+        addBuff(buff: Buff) {
+            if (this.contains(buff.id))
+                this.buffs.push(buff);
+            buff.onAdd();
         }
 
         contains(id: buffId): boolean {
+            for (let buff of this.buffs) {
+                if (buff.id == id) {
+                    return true;
+                }
+            }
             return false;
         }
 
@@ -45,8 +76,6 @@ export namespace buff {
         update(deltaTime: number) {
 
         }
-
     }
-
 }
 
