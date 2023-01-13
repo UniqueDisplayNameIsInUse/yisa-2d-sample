@@ -1,10 +1,12 @@
-import { _decorator, Component, input, math, Node, Quat, quat, v2, v3, Vec2, Vec3 } from 'cc';
+import { _decorator, Component, math, Node, Quat, v2, v3, Vec2, Vec3 } from 'cc';
 import { Actor } from './Actor';
 import { Idle } from './state/Idle';
 import { Run } from './state/Run';
 import { StateDefine } from './StateDefine';
 import { HardwareInputs } from '../inputs/HardwareInputs';
 import { mathutil } from '../util/MathUtil';
+import { Dash } from './state/Dash';
+import { SimpleEmitter } from './projectile/SimpleEmitter';
 const { ccclass, property, requireComponent } = _decorator;
 
 let temp: Vec2 = v2(0, 0);
@@ -23,37 +25,52 @@ export class PlayerController extends Component {
     @property(Node)
     gun: Node | null = null;
 
+    @property(SimpleEmitter)
+    projectileEmitter: SimpleEmitter;
+
+    static instance: PlayerController | null = null;
+
+    onLoad() {
+        PlayerController.instance = this;
+    }
+
     start() {
         this.actor = this.node.getComponent(Actor);
-        this.actor.animationStateMachine.regist(StateDefine.Idle, new Idle(this.actor));
-        this.actor.animationStateMachine.regist(StateDefine.Run, new Run(this.actor));
+        this.actor.stateMgr.registState(new Idle(StateDefine.Idle, this.actor));
+        this.actor.stateMgr.registState(new Run(StateDefine.Run, this.actor));
+        this.actor.stateMgr.registState(new Dash(StateDefine.Dash, this.actor));
 
-        this.actor.animationStateMachine.registTransition(StateDefine.Idle, StateDefine.Run, () => { return true; })
-        this.actor.animationStateMachine.registTransition(StateDefine.Run, StateDefine.Idle, () => { return true; })
+        this.actor.stateMgr.startWith(StateDefine.Idle);
 
-        this.actor.animationStateMachine.transitTo(StateDefine.Idle);
+        //PhysicsSystem2D.instance.debugDrawFlags = EPhysics2DDrawFlags.All;
+
+        this.projectileEmitter.actor = this.actor;
+    }
+
+    onDestory() {
+        PlayerController.instance = null;
     }
 
     update(deltaTime: number) {
         let h = HardwareInputs.getValue("horizontal");
         let v = HardwareInputs.getValue("vertical");
-        let run = Math.abs(h) > 0 || Math.abs(v) > 0;
-
-        temp.set(h * this.actor.actorProperty.linearSpeed, v * this.actor.actorProperty.linearSpeed);
-        this.actor.rigidbody.linearVelocity = temp;
-        //console.log(h, v);
-
-        if (run) {
-            this.actor.animationStateMachine.transitTo(StateDefine.Run);
+        this.actor.input.set(h, v);
+        if (this.actor.input.length() > math.EPSILON) {
+            this.actor.stateMgr.transit(StateDefine.Run);
         } else {
-            this.actor.animationStateMachine.transitTo(StateDefine.Idle);
+            this.actor.stateMgr.transit(StateDefine.Idle);
         }
 
-        // do rotate gun
         this.rotateGun();
 
         if (HardwareInputs.getKeyUp("fire")) {
             console.log('fire');
+            this.projectileEmitter.emit();
+        }
+
+        if (HardwareInputs.getKeyDown("jump")) {
+            console.log('jump');
+            this.actor.stateMgr.transit(StateDefine.Dash);
         }
     }
 
@@ -67,7 +84,7 @@ export class PlayerController extends Component {
 
         this.gun.setWorldRotation(tempQuat);
     }
-        
+
 }
 
 

@@ -1,4 +1,4 @@
-import { ccenum, CCFloat, CCString, EventKeyboard, EventMouse, input, Input, KeyCode, math, System, _decorator, CCInteger, Vec3, v3, Vec2, v2 } from "cc";
+import { ccenum, CCFloat, CCString, EventKeyboard, EventMouse, input, Input, KeyCode, math, System, _decorator, CCInteger, Vec3, v3, Vec2, v2, sys } from "cc";
 const { ccclass, property } = _decorator;
 
 export enum KeyType {
@@ -85,7 +85,7 @@ export class HardwareInputSystem {
         input.on(Input.EventType.KEY_UP, this.onKeyUp, this);
         input.on(Input.EventType.MOUSE_DOWN, this.onMouseButtonDown, this);
         input.on(Input.EventType.MOUSE_UP, this.onMouseButtonUp, this);
-        input.on(Input.EventType.MOUSE_MOVE, this.onMouseMove, this);
+        input.on(Input.EventType.MOUSE_MOVE, this.onMouseMove, this);        
 
     }
 
@@ -109,7 +109,7 @@ export class HardwareInputSystem {
                 this.keyboards.set(ic.nagetiveKey, ic.name);
                 this.keyboards.set(ic.positive, ic.name);
             } else if (ic.hardWareType == HardewareInputType.Mouse) {
-                this.mouses.set(ic.mouseButton, ic.name);                
+                this.mouses.set(ic.mouseButton, ic.name);
             }
         }
     }
@@ -180,10 +180,11 @@ export class HardwareInputSystem {
     update(dt: number) {
         for (let ic of this.inputConfigs.values()) {
             const sensitiviy = ic.sensitiviy * (1 - ic.damping);
+            const absV = Math.abs(ic.value);
             if (ic.isPressed) {
                 ic.value += (ic.isNegative ? -1 : 1) * sensitiviy;
-            } else if (Math.abs(ic.value) > math.EPSILON) {
-                let delta = Math.abs(ic.value) - sensitiviy;
+            } else if (absV > sensitiviy) {
+                let delta = absV - sensitiviy;
                 delta = delta < sensitiviy ? delta : sensitiviy;
                 ic.value -= Math.sign(ic.value) * delta;
             } else {

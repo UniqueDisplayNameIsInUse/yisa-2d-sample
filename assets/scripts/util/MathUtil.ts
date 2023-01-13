@@ -1,4 +1,4 @@
-import { IVec3Like, math, v3, Vec3 } from "cc";
+import { IVec3Like, math, Quat, v3, Vec3 } from "cc";
 
 export namespace mathutil {
 
@@ -6,6 +6,14 @@ export namespace mathutil {
     let tempVec2: Vec3 = v3()
     let tempVec3: Vec3 = v3()
     let up = v3()
+
+    export const ROT_Y_180: Readonly<Quat> = newQuatFromEluer(0, 180, 0);
+
+    export function newQuatFromEluer(x: number, y: number, z: number): Quat {
+        let q = new Quat();
+        Quat.fromEuler(q, x, y, z);
+        return q;
+    }
 
     export function equals(a: number, b: number, epsilon: number = math.EPSILON): boolean {
         return Math.abs(a - b) < epsilon;

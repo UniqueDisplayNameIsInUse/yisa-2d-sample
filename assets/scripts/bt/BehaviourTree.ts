@@ -1,5 +1,8 @@
 import { math } from "cc";
 
+/**
+ * 行为树
+ */
 export namespace bt {
 
     /**
@@ -40,10 +43,7 @@ export namespace bt {
      */
     export class ExecuteResult {
         executeState: ExecuteState = ExecuteState.Fail;
-        blackboard: Blackboard;
-        constructor() {
-            this.blackboard = new Blackboard();
-        }
+        blackboard: Blackboard = new Blackboard();
     }
 
     /**
@@ -132,7 +132,7 @@ export namespace bt {
             markFail(result);
             let successCount: number = 0;
             for (let child of this.children) {
-                result = child.execute(dt, result);
+                child.execute(dt, result);
                 if (result.executeState == ExecuteState.Success) {
                     successCount++;
                 }
@@ -209,6 +209,26 @@ export namespace bt {
         }
     }
 
+    /**
+     * check has key
+     */
+    export class ContainsKey extends Condition {
+        isSatisfy(result: ExecuteResult): boolean {
+            return result.blackboard.has(this.key);
+        }
+        key: string;
+    }
+
+    /**
+     * check if the key is true
+     */
+    export class IsTrue extends Condition {
+        isSatisfy(result: ExecuteResult): boolean {
+            return result.blackboard.get(this.key);
+        }
+        key: string
+    }
+
 
     /**
      * AI 的黑板     
@@ -220,7 +240,7 @@ export namespace bt {
             return this.data.has(name)
         }
 
-        add(name: string, val: any) {
+        set(name: string, val: any) {
             this.data.set(name, val)
         }
 
@@ -248,8 +268,8 @@ export namespace bt {
             this.result.blackboard = bb;
         }
 
-        addData(name: string, value: any) {
-            this.result.blackboard.add(name, value);
+        setData(name: string, value: any) {
+            this.result.blackboard.set(name, value);
         }
 
         getData(name: string): any {

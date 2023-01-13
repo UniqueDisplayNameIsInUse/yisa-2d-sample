@@ -1,4 +1,6 @@
-export enum StateDefine{
+export enum StateDefine {
     Idle = 'idle',
     Run = 'run',
+    Dash = 'dash',
+    Die = 'die',
 }

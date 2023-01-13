@@ -1,23 +1,35 @@
-import { State } from "../../fsm/State";
+import { Vec2, debug } from "cc";
 import { StateDefine } from "../StateDefine";
 import { ActorState } from "./ActorState";
+import { timeUtl } from "../../util/Time";
 
-export class Idle extends ActorState implements State{
+export class Idle extends ActorState {
 
-    onEnter(...args: any): void {
-        this.animation.play(StateDefine.Idle);
+    update(deltaTime: number) {
+
     }
 
-    onExit(...args: any): void {
-        
+    onEnter(): void {        
+        this.actor.rigidbody.linearVelocity = Vec2.ZERO;
+        let hasIdle = this.animation.getState(StateDefine.Idle);
+        if (hasIdle){
+            this.animation.play(StateDefine.Idle);
+        }            
     }
 
-    onUpdate(deltaTime: number): void {
-        
+    onExit(): void {
+
     }
 
     onDestory(): void {
-        
+
     }
-    
+
+
+    canTransit(to: StateDefine): boolean {
+        if (to == StateDefine.Idle) {
+            return false;
+        }
+        return true;
+    }
 } 

@@ -68,8 +68,8 @@ export class BtTest extends Component {
         let patrol = new Patrol();
         seq.addChild(patrol);
 
-        this.behaviourTree.result.blackboard.add(ENTITY, null);
-        this.behaviourTree.result.blackboard.add(TARGET, null);
+        this.behaviourTree.result.blackboard.set(ENTITY, null);
+        this.behaviourTree.result.blackboard.set(TARGET, null);
     }
 
     update(deltaTime: number) {

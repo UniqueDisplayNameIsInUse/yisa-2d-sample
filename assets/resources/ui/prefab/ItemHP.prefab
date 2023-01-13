@@ -174,7 +174,7 @@
       "y": 0.5
     },
     "_fillStart": 0.25,
-    "_fillRange": 0.5,
+    "_fillRange": 1,
     "_isTrimmedMode": true,
     "_useGrayscale": false,
     "_atlas": null,

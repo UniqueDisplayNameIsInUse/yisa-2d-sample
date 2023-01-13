@@ -1,6 +1,4 @@
-import { Color, Node, NodeEventType, Sprite, SpriteFrame, UITransform, Vec3, director, find, instantiate, macro, v3 } from "cc";
-
-let tempVec3: Vec3 = v3(0, 0, 0);
+import { Node, Pool, Sprite, SpriteFrame, UITransform, Vec3, instantiate, macro, v3 } from "cc";
 
 export class Residual {
     frame: SpriteFrame | null = null;
@@ -15,7 +13,7 @@ export class ResidualShadows {
 
     private _count: number = 10;
 
-    private set count(v: number) {        
+    private set count(v: number) {
         this._count = v;
     }
 
@@ -25,7 +23,7 @@ export class ResidualShadows {
 
     private _interval: number = 0.2;
 
-    private set interval(v: number) {        
+    private set interval(v: number) {
         this._interval = v;
     }
     get interval(): number {
@@ -46,6 +44,9 @@ export class ResidualShadows {
     residuals: Array<Residual> = [];
     renderNode: Node = null;
 
+    cloneTarget: Node = null;
+    nodePool: Pool<Node> = null;
+
     constructor(renderNode: Node, renderer: Sprite, count: number = 5, interval: number = 0.1) {
         this.renderNode = renderNode;
         this.renderer = renderer;
@@ -57,7 +58,7 @@ export class ResidualShadows {
     record() {
         if (this.residuals.length >= this.count) {
             let r = this.residuals[0];
-            r.sprite.node.removeFromParent();
+            r.sprite.node.removeFromParent();            
             this.residuals = this.residuals.slice(1);
         }
 
@@ -65,7 +66,19 @@ export class ResidualShadows {
         r.frame = this.renderer.spriteFrame;
         r.position = this.renderer.node.worldPosition.clone();
         if (r.sprite == null) {
-            let no = instantiate(this.renderer.node) as Node;
+            if (this.cloneTarget == null) {
+                this.cloneTarget = instantiate(this.renderer.node) as Node;
+            }
+
+            if (this.nodePool == null) {
+                this.nodePool = new Pool((): Node => {
+                    return instantiate(this.cloneTarget)
+                }, this.count, (node: Node) => {
+                    node.removeFromParent()
+                })
+            }
+
+            let no = this.nodePool.alloc();
             no.name = "Residual";
             no.setParent(this.renderNode.parent);
             let i = this.renderNode.getSiblingIndex();
@@ -80,7 +93,7 @@ export class ResidualShadows {
             let spriteRenderer = no.getComponent(Sprite) || no.addComponent(Sprite);
             spriteRenderer.spriteFrame = r.frame;
             const c = spriteRenderer.color;
-            c.set(c.r, c.g, c.b, (1.0 - this.residuals.length / this.count) * 255);                        
+            c.set(c.r, c.g, c.b, (1.0 - this.residuals.length / this.count) * 255);
 
             no.worldPosition = r.position;
             r.sprite = spriteRenderer;
@@ -89,7 +102,7 @@ export class ResidualShadows {
         this.residuals.push(r);
     }
 
-    private invalidate() {        
+    private invalidate() {
         this.renderer.schedule(() => {
             this.record()
         }, this.interval, macro.REPEAT_FOREVER, 0.0);
