@@ -1,4 +1,4 @@
-import { _decorator, Collider2D, Component, Contact2DType, IPhysics2DContact, Node, RigidBody2D, Tween } from 'cc';
+import { _decorator, Collider2D, Component, Contact2DType, IPhysics2DContact, Node, Pool, RigidBody2D, Tween } from 'cc';
 import { colliderTag } from '../ColliderTags';
 import { Actor } from '../Actor';
 const { ccclass, property, requireComponent } = _decorator;
@@ -26,12 +26,12 @@ export class Projectile extends Component {
         this.collider.on(Contact2DType.BEGIN_CONTACT, this.onCollisionBegin, this);
     }
 
-    onDisable(){
+    onDisable() {
         this.collider.off(Contact2DType.BEGIN_CONTACT, this.onCollisionBegin, this);
     }
 
-    onCollisionBegin(a: Collider2D, b: Collider2D, contact:IPhysics2DContact) {                
-        if (colliderTag.isScene(b.tag) || colliderTag.isProjectileHitable(a.tag, b.tag)) {                        
+    onCollisionBegin(a: Collider2D, b: Collider2D, contact: IPhysics2DContact) {
+        if (colliderTag.isScene(b.tag) || colliderTag.isProjectileHitable(a.tag, b.tag)) {
             //console.log('onCollisionBegin disable collider');
             a.enabled = false;
             this.scheduleOnce(() => {
@@ -39,6 +39,6 @@ export class Projectile extends Component {
                 //this.node.emit(ProjectileEmitter.PROJECTILE_DEAD, this.node);
             }, 0.1);
         }
-    }    
+    }
 }
 

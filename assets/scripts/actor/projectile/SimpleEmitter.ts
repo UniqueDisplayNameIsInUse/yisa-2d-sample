@@ -1,9 +1,12 @@
-import { CCFloat, Component, Node, Prefab, RigidBody2D, Vec2, Vec3, _decorator, instantiate, v2, v3 } from "cc";
-import { sceneUtil } from "../../util/SceneUtil";
+import { CCFloat, Component, Node, Pool, Prefab, RigidBody2D, Vec2, Vec3, _decorator, find, instantiate, v2, v3 } from "cc";
 import { skill } from "../skills/Skill";
 import { Projectile } from "./Projectile";
 import { Actor } from "../Actor";
 const { ccclass, property, requireComponent, disallowMultiple } = _decorator;
+
+export enum ProjectileEventType {
+    onProjectileDead = 'onProjectileDead',
+}
 
 @ccclass('SimpleEmitter')
 export class SimpleEmitter extends Component {
@@ -21,10 +24,23 @@ export class SimpleEmitter extends Component {
     startAngularVelocity: number = 20;
 
     skill: skill.ISkill | null = null;
-    
-    actor:Actor = null;
+
+    actor: Actor = null;
+
+    projectilePool: Pool<Node> | null = null;
 
     start() {
+        this.projectilePool = new Pool((): Node => {
+            let n = instantiate(this.projectilePrefab!);
+            n.active = false;
+            return n;
+        }, 10, (n: Node) => {
+            n.removeFromParent();
+        });
+    }
+
+    onDestroy() {
+        this.projectilePool.destroy();
     }
 
     emit() {
@@ -34,9 +50,10 @@ export class SimpleEmitter extends Component {
                 continue;
             }
             let wr = emitNode.worldRotation;
-            let node = instantiate(this.projectilePrefab);
+            let node = this.projectilePool.alloc();//instantiate(this.projectilePrefab);
+            node.active = true;
 
-            sceneUtil.gameCanvas().addChild(node);
+            find('LevelCanvas').addChild(node);
 
             let left = Vec3.UNIT_X;
             let velocityV3 = v3();
@@ -55,6 +72,13 @@ export class SimpleEmitter extends Component {
 
             let projectile = node.getComponent(Projectile);
             projectile.host = this.actor;
+
+            node.once(ProjectileEventType.onProjectileDead, this.onProjectileDead, this);
         }
+    }
+
+    onProjectileDead(n: Node) {
+        n.active = false;
+        this.projectilePool.free(n);
     }
 }

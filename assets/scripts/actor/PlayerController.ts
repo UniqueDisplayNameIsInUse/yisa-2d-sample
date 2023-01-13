@@ -52,6 +52,11 @@ export class PlayerController extends Component {
     }
 
     update(deltaTime: number) {
+
+        if(this.actor.dead) {
+            return;
+        }
+
         let h = HardwareInputs.getValue("horizontal");
         let v = HardwareInputs.getValue("vertical");
         this.actor.input.set(h, v);

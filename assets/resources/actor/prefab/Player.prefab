@@ -48,7 +48,7 @@
     },
     "_lpos": {
       "__type__": "cc.Vec3",
-      "x": -377.728,
+      "x": -113.728,
       "y": 0,
       "z": 0
     },
@@ -619,7 +619,7 @@
       "__uuid__": "eb1c2a31-7b2e-402c-889c-5f77104c0185",
       "__expectedType__": "cc.Prefab"
     },
-    "startLinearSpeed": 5,
+    "startLinearSpeed": 30,
     "startAngularVelocity": 20,
     "_id": ""
   },

@@ -1,6 +1,7 @@
-import { Animation, AnimationState, Vec2 } from "cc";
+import { Animation, AnimationState, Vec2, director } from "cc";
 import { StateDefine } from "../StateDefine";
 import { ActorState } from "./ActorState";
+import { ActorEvent } from "../Actor";
 
 export class Die extends ActorState {
 
@@ -13,6 +14,7 @@ export class Die extends ActorState {
         this.animation.once(Animation.EventType.FINISHED, this.onDieEnd, this)
 
         this.actor.dead = true;
+        director.emit(ActorEvent.OnDie, this.actor.node);
     }
 
     onDieEnd(type: Animation.EventType, state: AnimationState) {

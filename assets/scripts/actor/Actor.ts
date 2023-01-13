@@ -1,4 +1,4 @@
-import { _decorator, Component, RigidBody2D, CircleCollider2D, Animation, Collider2D, Sprite, Vec2, v2, math, Vec3, Color, Quat, CCFloat, Contact2DType, IPhysics2DContact, v3 } from 'cc';
+import { _decorator, Component, RigidBody2D, CircleCollider2D, Animation, Collider2D, Sprite, Vec2, v2, math, Vec3, Color, Quat, CCFloat, Contact2DType, IPhysics2DContact, v3, director } from 'cc';
 import { StateManager } from '../fsm/StateMachine';
 import { ActorProperty } from './ActorProperty';
 import { StateDefine } from './StateDefine';
@@ -8,6 +8,10 @@ import { mathutil } from '../util/MathUtil';
 import { colliderTag } from './ColliderTags';
 import { Projectile } from './projectile/Projectile';
 const { ccclass, property, requireComponent, disallowMultiple } = _decorator;
+
+export enum ActorEvent {
+    OnDie = 'onDie',
+}
 
 @ccclass('Actor')
 @requireComponent(RigidBody2D)
@@ -72,7 +76,7 @@ export class Actor extends Component {
             let hurtSrc = cb.node.getComponent(Projectile).host;
             let hitNormal = v3();
             Vec2.subtract(hitNormal, ca.node.worldPosition, cb.node.worldPosition);
-            hitNormal.normalize();  
+            hitNormal.normalize();
             const v2Normal = v2(hitNormal.x, hitNormal.y);
             this.onHurt(hurtSrc.actorProperty.attack, hurtSrc, v2Normal);
         }
@@ -90,8 +94,8 @@ export class Actor extends Component {
         // hurtImpluse.multiplyScalar(20);
         // this.rigidbody.applyLinearImpulseToCenter(hurtImpluse, true);
 
-        if (this.actorProperty.hp <= 0) {
-            this.stateMgr.transit(StateDefine.Die);
+        if (this.actorProperty.hp <= 0) {            
+            this.stateMgr.transit(StateDefine.Die);            
         }
     }
 }
