@@ -1,6 +1,4 @@
-import { Component, Node, _decorator, director } from "cc";
-import { ActorEvent } from "../actor/Actor";
-import { PlayerController } from "../actor/PlayerController";
+import { Component, _decorator, director } from "cc";
 const { ccclass, property, requireComponent } = _decorator;
 
 @ccclass("UIFail")

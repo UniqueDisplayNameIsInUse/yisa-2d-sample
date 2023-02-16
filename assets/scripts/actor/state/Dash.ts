@@ -1,7 +1,6 @@
-import { SkinnedMeshBatchRenderer, Vec2, input, math, v2 } from "cc";
+import { Vec2, v2 } from "cc";
 import { ActorState } from "./ActorState";
 import { StateDefine } from "../StateDefine";
-import { HardwareInputs } from "../../inputs/HardwareInputs";
 
 export class Dash extends ActorState {
     time: number = 0;

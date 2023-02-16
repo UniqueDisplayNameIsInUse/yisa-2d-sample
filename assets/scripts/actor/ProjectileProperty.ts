@@ -5,10 +5,6 @@ export enum DirectionalType {
     Chase,
 }
 
-export enum SplitType{
-    
-}
-
 export class ProjectileProperty {
 
     /**

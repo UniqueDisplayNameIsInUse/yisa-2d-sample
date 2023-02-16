@@ -1,18 +1,14 @@
-import { _decorator, Collider2D, Component, Contact2DType, ERaycast2DType, ERigidBodyType, IPhysics2DContact, math, Node, NodeEventType, PhysicsSystem, PhysicsSystem2D, utils, v2, v3, Vec2, Vec3 } from 'cc';
+import { _decorator, Component, math, v3 } from 'cc';
 import { Actor } from './Actor';
 import { bt } from '../bt/BehaviourTree';
 import { Chase, EscapeDash, HasTarget, IsSkillValid, IsLowHp, IsInAttackRange, UseSkill, MoveToDest, Rage, SetMoveDest, IsUseSkill } from './ai/AI';
 import { BlackboardKey } from './ai/BlackboardKey';
-import { colliderTag } from './ColliderTags';
 import { Idle } from './state/Idle';
 import { StateDefine } from './StateDefine';
 import { Run } from './state/Run';
 import { Dash } from './state/Dash';
-import { Projectile } from './projectile/Projectile';
 import { Die } from './state/Die';
 import { skill } from './skills/Skill';
-import { phyutil } from '../util/PhyUtil';
-import { timeUtl } from '../util/Time';
 const { ccclass, property, requireComponent } = _decorator;
 
 @ccclass('EnemyController')

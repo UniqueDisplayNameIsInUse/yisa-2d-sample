@@ -39,11 +39,8 @@ export class PlayerController extends Component {
         this.actor.stateMgr.registState(new Idle(StateDefine.Idle, this.actor));
         this.actor.stateMgr.registState(new Run(StateDefine.Run, this.actor));
         this.actor.stateMgr.registState(new Dash(StateDefine.Dash, this.actor));
-
         this.actor.stateMgr.startWith(StateDefine.Idle);
-
         //PhysicsSystem2D.instance.debugDrawFlags = EPhysics2DDrawFlags.All;
-
         this.projectileEmitter.actor = this.actor;
     }
 
@@ -53,7 +50,7 @@ export class PlayerController extends Component {
 
     update(deltaTime: number) {
 
-        if(this.actor.dead) {
+        if (this.actor.dead) {
             return;
         }
 
@@ -81,12 +78,9 @@ export class PlayerController extends Component {
 
     rotateGun() {
         let ms = HardwareInputs.mousePosition;
-
         Vec3.subtract(tempV3, ms, this.gun.worldPosition);
-
         let a = mathutil.signAngle(tempV3, Vec3.RIGHT, Vec3.FORWARD);
         Quat.fromEuler(tempQuat, 0, 0, math.toDegree(a));
-
         this.gun.setWorldRotation(tempQuat);
     }
 

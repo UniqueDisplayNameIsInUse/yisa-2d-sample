@@ -87,6 +87,8 @@ export namespace buff {
             let buff = this.buffs.find(t => { return name == t.id; })
             let index = this.buffs.indexOf(buff);
             this.buffs.splice(index, 1);
+            buff.onExit();
+            buff.onDestory();
         }
     }
 

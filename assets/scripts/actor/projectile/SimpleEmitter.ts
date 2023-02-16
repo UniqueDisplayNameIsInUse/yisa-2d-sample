@@ -2,7 +2,7 @@ import { CCFloat, Component, Node, Pool, Prefab, RigidBody2D, Vec2, Vec3, _decor
 import { skill } from "../skills/Skill";
 import { Projectile } from "./Projectile";
 import { Actor } from "../Actor";
-const { ccclass, property, requireComponent, disallowMultiple } = _decorator;
+const { ccclass, property } = _decorator;
 
 export enum ProjectileEventType {
     onProjectileDead = 'onProjectileDead',
