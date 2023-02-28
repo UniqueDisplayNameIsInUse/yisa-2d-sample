@@ -1,17 +1,11 @@
 import { _decorator, Component, RigidBody2D, CircleCollider2D, Animation, Collider2D, Sprite, Vec2, v2, math, Vec3, Color, Quat, CCFloat, Contact2DType, IPhysics2DContact, v3, director } from 'cc';
 import { StateManager } from '../fsm/StateMachine';
-import { ActorProperty } from './ActorProperty';
 import { StateDefine } from './StateDefine';
-import { skill } from './skills/Skill';
-import { buff } from '../buff/Buff';
 import { mathutil } from '../util/MathUtil';
 import { colliderTag } from './ColliderTags';
 import { Projectile } from './projectile/Projectile';
+import { GameEvent } from '../event/GameEvent';
 const { ccclass, property, requireComponent, disallowMultiple } = _decorator;
-
-export enum ActorEvent {
-    OnDie = 'onDie',
-}
 
 @ccclass('Actor')
 @requireComponent(RigidBody2D)
@@ -28,18 +22,17 @@ export class Actor extends Component {
     @property(Animation)
     animation: Animation = null;
 
-    actorProperty: ActorProperty = new ActorProperty();
+    hp: number = 100;
+    maxHp: number = 100;
+    attack: number = 10;
+    linearSpeed: number = 3;
 
     @property(Sprite)
     mainRenderer: Sprite
 
-    skillMgr: skill.Manager = new skill.Manager(this);
-
     _input: Vec2 = v2();
     set input(v: Vec2) { this._input.set(v.x, v.y); }
     get input(): Vec2 { return this._input; }
-
-    buffManager: buff.BuffManager = new buff.BuffManager();
 
     dead: boolean = false;
 
@@ -49,9 +42,6 @@ export class Actor extends Component {
     start() {
         this.rigidbody = this.node.getComponent(RigidBody2D);
         this.collider = this.node.getComponent(Collider2D);
-        this.buffManager.actor = this;
-
-        this.actorProperty.linearSpeed = this.linsearSpeed;
 
         this.collider.on(Contact2DType.BEGIN_CONTACT, this.onProjectileTriggerEnter, this);
     }
@@ -61,7 +51,6 @@ export class Actor extends Component {
 
     update(deltaTime: number) {
         this.stateMgr.update(deltaTime);
-        this.skillMgr.update(deltaTime);
 
         if (this.input.x < 0) {
             this.mainRenderer.node.rotation = mathutil.ROT_Y_180;
@@ -78,24 +67,20 @@ export class Actor extends Component {
             Vec2.subtract(hitNormal, ca.node.worldPosition, cb.node.worldPosition);
             hitNormal.normalize();
             const v2Normal = v2(hitNormal.x, hitNormal.y);
-            this.onHurt(hurtSrc.actorProperty.attack, hurtSrc, v2Normal);
+            this.onHurt(this.attack, hurtSrc, v2Normal);
         }
     }
 
     onHurt(damage: number, from: Actor, hurtDirection?: Vec2) {
-        this.actorProperty.hp = Math.floor(math.clamp(this.actorProperty.hp - damage, 0, this.actorProperty.maxHp));
+        this.hp = Math.floor(math.clamp(this.hp - damage, 0, this.maxHp));
 
         this.mainRenderer.color = Color.RED;
         this.scheduleOnce(() => {
             this.mainRenderer.color = Color.WHITE;
         }, 0.2);
 
-        // let hurtImpluse = v2(hurtDirection.x, hurtDirection.y);
-        // hurtImpluse.multiplyScalar(20);
-        // this.rigidbody.applyLinearImpulseToCenter(hurtImpluse, true);
-
-        if (this.actorProperty.hp <= 0) {            
-            this.stateMgr.transit(StateDefine.Die);            
+        if (this.hp <= 0) {
+            this.stateMgr.transit(StateDefine.Die);
         }
     }
 }

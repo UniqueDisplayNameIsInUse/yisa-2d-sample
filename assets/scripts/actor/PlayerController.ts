@@ -1,17 +1,15 @@
-import { _decorator, Component, math, Node, Quat, v2, v3, Vec2, Vec3 } from 'cc';
+import { _decorator, Component, director, EventKeyboard, Input, input, KeyCode, math, Node, v3, Vec3 } from 'cc';
 import { Actor } from './Actor';
 import { Idle } from './state/Idle';
 import { Run } from './state/Run';
 import { StateDefine } from './StateDefine';
-import { HardwareInputs } from '../inputs/HardwareInputs';
-import { mathutil } from '../util/MathUtil';
 import { Dash } from './state/Dash';
 import { SimpleEmitter } from './projectile/SimpleEmitter';
+import { VirtualInput } from '../inputs/VirtualInput';
+import { AimDirection } from './AimDirection';
+import { GameEvent } from '../event/GameEvent';
+import { Die } from './state/Die';
 const { ccclass, property, requireComponent } = _decorator;
-
-let temp: Vec2 = v2(0, 0);
-let tempV3: Vec3 = v3(0, 0, 0);
-let tempQuat: Quat = new Quat();
 
 @ccclass('PlayerController')
 @requireComponent(Actor)
@@ -30,6 +28,10 @@ export class PlayerController extends Component {
 
     static instance: PlayerController | null = null;
 
+    target: Actor = null;
+
+    aimAt: Vec3 = v3();
+
     onLoad() {
         PlayerController.instance = this;
     }
@@ -37,51 +39,78 @@ export class PlayerController extends Component {
     start() {
         this.actor = this.node.getComponent(Actor);
         this.actor.stateMgr.registState(new Idle(StateDefine.Idle, this.actor));
-        this.actor.stateMgr.registState(new Run(StateDefine.Run, this.actor));
-        this.actor.stateMgr.registState(new Dash(StateDefine.Dash, this.actor));
+        this.actor.stateMgr.registState(new Run(StateDefine.Run, this.actor));        
+        this.actor.stateMgr.registState(new Die(StateDefine.Die, this.actor));
         this.actor.stateMgr.startWith(StateDefine.Idle);
         //PhysicsSystem2D.instance.debugDrawFlags = EPhysics2DDrawFlags.All;
         this.projectileEmitter.actor = this.actor;
+
+        director.on(GameEvent.OnFireButtonClicked, this.fire, this);
+
+        input.on(Input.EventType.KEY_DOWN, this.onKeyDown, this);
+        input.on(Input.EventType.KEY_UP, this.onKeyUp, this);
     }
 
     onDestory() {
         PlayerController.instance = null;
+        director.off(GameEvent.OnFireButtonClicked, this.fire, this);
+
+        input.off(Input.EventType.KEY_DOWN, this.onKeyDown, this);
+        input.off(Input.EventType.KEY_UP, this.onKeyUp, this);
     }
 
     update(deltaTime: number) {
-
         if (this.actor.dead) {
             return;
         }
 
-        let h = HardwareInputs.getValue("horizontal");
-        let v = HardwareInputs.getValue("vertical");
+        let h = VirtualInput.horizontal;
+        let v = VirtualInput.vertical;        
         this.actor.input.set(h, v);
         if (this.actor.input.length() > math.EPSILON) {
             this.actor.stateMgr.transit(StateDefine.Run);
         } else {
             this.actor.stateMgr.transit(StateDefine.Idle);
         }
+    }
 
-        this.rotateGun();
+    fire(direction: AimDirection) {
+        this.gun.setWorldRotationFromEuler(0, 0, direction as number);
+        this.projectileEmitter.emit();
+    }
 
-        if (HardwareInputs.getKeyUp("fire")) {
-            console.log('fire');
-            this.projectileEmitter.emit();
-        }
-
-        if (HardwareInputs.getKeyDown("jump")) {
-            console.log('jump');
-            this.actor.stateMgr.transit(StateDefine.Dash);
+    onKeyDown(event: EventKeyboard) {
+        switch (event.keyCode) {
+            case KeyCode.KEY_W:
+                VirtualInput.vertical = 1;
+                break;
+            case KeyCode.KEY_S:
+                VirtualInput.vertical = -1;
+                break;
+            case KeyCode.KEY_A:
+                VirtualInput.horizontal = -1;
+                break;
+            case KeyCode.KEY_D:
+                VirtualInput.horizontal = 1;
+                break;
         }
     }
 
-    rotateGun() {
-        let ms = HardwareInputs.mousePosition;
-        Vec3.subtract(tempV3, ms, this.gun.worldPosition);
-        let a = mathutil.signAngle(tempV3, Vec3.RIGHT, Vec3.FORWARD);
-        Quat.fromEuler(tempQuat, 0, 0, math.toDegree(a));
-        this.gun.setWorldRotation(tempQuat);
+    onKeyUp(event: EventKeyboard) {
+        switch (event.keyCode) {
+            case KeyCode.KEY_W:
+                VirtualInput.vertical = 0;
+                break;
+            case KeyCode.KEY_S:
+                VirtualInput.vertical = 0;
+                break;
+            case KeyCode.KEY_A:
+                VirtualInput.horizontal = 0;
+                break;
+            case KeyCode.KEY_D:
+                VirtualInput.horizontal = 0;
+                break;
+        }
     }
 
 }

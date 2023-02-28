@@ -1,5 +1,4 @@
-import { CCFloat, Component, Node, Pool, Prefab, RigidBody2D, Vec2, Vec3, _decorator, find, instantiate, v2, v3 } from "cc";
-import { skill } from "../skills/Skill";
+import { CCFloat, Component, Node, Pool, Prefab, RigidBody2D, Vec2, Vec3, _decorator, find, game, instantiate, v2, v3 } from "cc";
 import { Projectile } from "./Projectile";
 import { Actor } from "../Actor";
 const { ccclass, property } = _decorator;
@@ -23,11 +22,13 @@ export class SimpleEmitter extends Component {
     @property(CCFloat)
     startAngularVelocity: number = 20;
 
-    skill: skill.ISkill | null = null;
-
     actor: Actor = null;
 
     projectilePool: Pool<Node> | null = null;
+
+    cooldown: number = 5;
+
+    castTime: number = 0;
 
     start() {
         this.projectilePool = new Pool((): Node => {
@@ -35,7 +36,7 @@ export class SimpleEmitter extends Component {
             n.active = false;
             return n;
         }, 10, (n: Node) => {
-            n.removeFromParent();
+            n.destroy();
         });
     }
 
@@ -43,7 +44,12 @@ export class SimpleEmitter extends Component {
         this.projectilePool.destroy();
     }
 
+    get isCoolingdown(): boolean {
+        return game.totalTime - this.castTime > this.cooldown * 1000;
+    }
+
     emit() {
+        this.castTime = game.totalTime;
         for (let i = 0; i < this.emitterRoot.children.length; i++) {
             let emitNode = this.emitterRoot.children[i];
             if (!emitNode.active) {

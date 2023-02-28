@@ -3,9 +3,6 @@
  */
 export enum BlackboardKey {
 
-    // Node
-    Owner = 'ownerNode',
-
     // Actor
     Actor = 'actor',
 

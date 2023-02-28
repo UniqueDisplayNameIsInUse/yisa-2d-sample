@@ -20,7 +20,7 @@ export class Run extends ActorState {
 
     update(deltaTime: number): void {
         this.velocity.set(this.actor.input.x, this.actor.input.y);
-        this.velocity.multiplyScalar(this.actor.actorProperty.linearSpeed);
+        this.velocity.multiplyScalar(this.actor.linearSpeed);
         this.actor.rigidbody.linearVelocity = this.velocity;
 
         if (this.actor.input.length() <= math.EPSILON) {

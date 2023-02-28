@@ -1,13 +1,8 @@
-import { Vec2, debug } from "cc";
+import { Vec2 } from "cc";
 import { StateDefine } from "../StateDefine";
 import { ActorState } from "./ActorState";
-import { timeUtl } from "../../util/Time";
 
-export class Idle extends ActorState {
-
-    update(deltaTime: number) {
-
-    }
+export class Idle extends ActorState {    
 
     onEnter(): void {        
         this.actor.rigidbody.linearVelocity = Vec2.ZERO;
@@ -17,6 +12,10 @@ export class Idle extends ActorState {
         }            
     }
 
+    update(deltaTime: number) {
+
+    }
+
     onExit(): void {
 
     }
@@ -24,7 +23,6 @@ export class Idle extends ActorState {
     onDestory(): void {
 
     }
-
 
     canTransit(to: StateDefine): boolean {
         if (to == StateDefine.Idle) {

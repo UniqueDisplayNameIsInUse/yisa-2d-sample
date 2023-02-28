@@ -1,7 +1,12 @@
-import { CCFloat, CCInteger, Component, Node, Prefab, _decorator, instantiate } from "cc";
-import { timeUtl } from "../util/Time";
+import { CCFloat, CCInteger, Component, Label, Node, Prefab, _decorator, assert, director, instantiate } from "cc";
+import { Actor } from "../actor/Actor";
+import { PlayerController } from "../actor/PlayerController";
+import { GameEvent } from "../event/GameEvent";
 const { ccclass, property, requireComponent } = _decorator;
 
+/**
+ * 出生点
+ */
 @ccclass("SpawnPoint")
 export class SpawnPoint {
 
@@ -15,8 +20,16 @@ export class SpawnPoint {
     repeatCount: number = 0;
 }
 
+/**
+ * 关卡
+ */
 @ccclass("Level")
 export class Level extends Component {
+
+    private static _instance: Level = null;
+
+    static get instance(): Level { return this._instance; };
+    private static set instance(value: Level) { this._instance = value; }
 
     @property([SpawnPoint])
     spawnPoints: Array<SpawnPoint> = [];
@@ -24,20 +37,38 @@ export class Level extends Component {
     @property(Prefab)
     enemyPrefab: Prefab | null = null;
 
-    desireTotalCount = 0;
+    totalCount = 0;
+    killedCount: number = 0;
+
+    @property(Node)
+    uiFail: Node = null;
+
+    @property(Node)
+    uiWin : Node = null;
+
+    @property(Label)
+    statictics: Label = null;
+
+    totalEnemyCount: number = 0;
 
     start() {
+        assert(Level.instance == null);
+        Level.instance = this;
 
-        timeUtl.resetLevelTime();
-
-        if (1){
-            for (let sp of this.spawnPoints) {
-                this.desireTotalCount += sp.repeatCount;
-                this.schedule(() => {
-                    this.doSpawn(sp)
-                }, sp.interval, sp.repeatCount, 0.0);
-            }
+        for (let sp of this.spawnPoints) {
+            this.totalCount += sp.repeatCount + 1;
+            this.schedule(() => {
+                this.doSpawn(sp)
+            }, sp.interval, sp.repeatCount, 0.0);
         }
+
+        director.on(GameEvent.OnDie, this.onActorDead, this);
+        this.statictics.string = `${this.killedCount}/${this.totalCount}`;
+    }
+
+    onDestory() {
+        Level.instance = null;
+        director.off(GameEvent.OnDie, this.onActorDead, this);
     }
 
     doSpawn(sp: SpawnPoint) {
@@ -46,7 +77,16 @@ export class Level extends Component {
         node.worldPosition = sp.spawnNode.worldPosition;
     }
 
-    onEnemyDead(node: Node) {
-        node.removeFromParent();
+    onActorDead(node: Node) {
+        if (node && node == PlayerController.instance?.node) {
+            this.uiFail.active = true;
+        } else {
+            this.killedCount++;
+            this.statictics.string = `${this.killedCount}/${this.totalCount}`; 
+            
+            if( this.killedCount >= this.totalCount){
+                this.uiWin.active = true;
+            }
+        }
     }
 }

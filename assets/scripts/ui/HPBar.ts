@@ -1,5 +1,6 @@
-import { Component, Layout, Prefab, Sprite, _decorator, instantiate, math } from "cc";
+import { Component, Layout, Prefab, Sprite, _decorator, director, instantiate } from "cc";
 import { PlayerController } from "../actor/PlayerController";
+import { GameEvent } from "../event/GameEvent";
 const { ccclass, property, requireComponent } = _decorator;
 
 const HEART_RATIO = 10;
@@ -14,15 +15,15 @@ export class HPBar extends Component {
     layout: Layout | null = null;
 
     start() {
-        this.layout = this.node.getComponent(Layout);
+        this.layout = this.node.getComponent(Layout);        
     }
 
     update(dt: number) {
         if (!PlayerController.instance || !PlayerController.instance.actor) {
             return;
         }
-        let hp = PlayerController.instance.actor.actorProperty.hp;
-        let maxHp = PlayerController.instance.actor.actorProperty.maxHp;
+        let hp = PlayerController.instance.actor.hp;
+        let maxHp = PlayerController.instance.actor.maxHp;
         let div = maxHp / HEART_RATIO;
         let maxHeart = Math.ceil(div);
         let p = hp % HEART_RATIO / HEART_RATIO;

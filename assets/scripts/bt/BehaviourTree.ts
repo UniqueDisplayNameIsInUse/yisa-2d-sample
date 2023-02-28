@@ -43,7 +43,7 @@ export namespace bt {
      */
     export class ExecuteResult {
         executeState: ExecuteState = ExecuteState.Fail;
-        blackboard: Blackboard = new Blackboard();
+        blackboard: Blackboard = new Map();
     }
 
     /**
@@ -185,8 +185,8 @@ export namespace bt {
      */
     export class Wait extends Action {
 
-        interval: number = 0;
-        waitDuration: number = 1;
+        elapsed: number = 0;
+        interval: number = 1;
         start: boolean = false;
 
         execute(dt: number, result: ExecuteResult) {
@@ -194,16 +194,16 @@ export namespace bt {
 
             if (!this.start) {
                 this.start = true;
-                this.interval = 0;
+                this.elapsed = 0;
             }
 
-            this.interval += dt;
-            if (this.interval < this.waitDuration) {
+            this.elapsed += dt;
+            if (this.elapsed < this.interval) {
                 markRunning(result);
                 return;
             }
 
-            this.interval = 0;
+            this.elapsed = 0;
             this.start = false;
             markSuccess(result);
         }
@@ -233,27 +233,11 @@ export namespace bt {
     /**
      * AI 的黑板     
      */
-    export class Blackboard {
-        data: Map<string, any> = new Map();
-
-        has(name: string): boolean {
-            return this.data.has(name)
-        }
-
-        set(name: string, val: any) {
-            this.data.set(name, val)
-        }
-
-        get(name: string): any {
-            if (!this.has(name)) {
-                return null;
-            }
-            return this.data.get(name)
-        }
-
-        remove(name: string) {
-            this.data.delete(name);
-        }
+    export interface Blackboard {
+        has(name: string): boolean;
+        set(name: string, val: any);
+        get(name: string): any;
+        delete(name: string);
     }
 
     /**
@@ -264,10 +248,6 @@ export namespace bt {
         root: BtNode
         result: ExecuteResult = new ExecuteResult();
 
-        setBlackboard(bb: Blackboard) {
-            this.result.blackboard = bb;
-        }
-
         setData(name: string, value: any) {
             this.result.blackboard.set(name, value);
         }
@@ -277,7 +257,7 @@ export namespace bt {
         }
 
         removeData(name: string) {
-            this.result.blackboard.remove(name);
+            this.result.blackboard.delete(name);
         }
 
         hasData(name: string): boolean {

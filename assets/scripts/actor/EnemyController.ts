@@ -1,14 +1,14 @@
 import { _decorator, Component, math, v3 } from 'cc';
 import { Actor } from './Actor';
 import { bt } from '../bt/BehaviourTree';
-import { Chase, EscapeDash, HasTarget, IsSkillValid, IsLowHp, IsInAttackRange, UseSkill, MoveToDest, Rage, SetMoveDest, IsUseSkill } from './ai/AI';
+import { Chase, EscapeDash, HasTarget, IsLowHp, IsInAttackRange, MoveToDest, Emit, IsCooldown, SetMoveDest, StayIdle } from './ai/BehaviourTree';
 import { BlackboardKey } from './ai/BlackboardKey';
 import { Idle } from './state/Idle';
 import { StateDefine } from './StateDefine';
 import { Run } from './state/Run';
 import { Dash } from './state/Dash';
 import { Die } from './state/Die';
-import { skill } from './skills/Skill';
+import { SimpleEmitter } from './projectile/SimpleEmitter';
 const { ccclass, property, requireComponent } = _decorator;
 
 @ccclass('EnemyController')
@@ -23,7 +23,6 @@ export class EnemyController extends Component {
 
     start() {
         this.actor = this.node.getComponent(Actor);
-        this.initSkills();
         this.createAI();
         this.initBlackboard();
 
@@ -31,8 +30,8 @@ export class EnemyController extends Component {
         this.actor.stateMgr.registState(new Run(StateDefine.Run, this.actor));
         this.actor.stateMgr.registState(new Dash(StateDefine.Dash, this.actor));
         this.actor.stateMgr.registState(new Die(StateDefine.Die, this.actor));
-        this.actor.stateMgr.startWith(StateDefine.Idle);        
-    }    
+        this.actor.stateMgr.startWith(StateDefine.Idle);
+    }
 
     update(deltaTime: number) {
         if (1) {
@@ -63,18 +62,6 @@ export class EnemyController extends Component {
 
         this.ai.root = rootNode;
 
-        // rage sequence
-        if (0) {
-            let rageSeq = new bt.Sequence();
-            rootNode.addChild(rageSeq);
-
-            let condRange = new IsLowHp();
-            rageSeq.addChild(condRange);
-
-            let rage = new Rage();
-            rageSeq.addChild(rage);
-        }
-
         if (1) {
             // escape 
             let escapeSeq = new bt.Sequence();
@@ -96,29 +83,8 @@ export class EnemyController extends Component {
             escapeSeq.addChild(escape);
         }
 
-        // chase and attack
-        if (1) {
-            // attack 
-            let useSkillSeq = new bt.Sequence();
-            rootNode.addChild(useSkillSeq);
-
-            //let hasTarget = new HasTarget();
-            //useSkillSeq.addChild(hasTarget);
-
-            //let isInAttackRange = new IsInAttackRange();
-            //useSkillSeq.addChild(isInAttackRange);
-
-            let hasValidSkill = new IsSkillValid();
-            useSkillSeq.addChild(hasValidSkill);
-
-            let useSkill = new UseSkill();
-            useSkillSeq.addChild(useSkill);
-
-        }
-
         // Partrol .... move to dest position
         if (1) {
-
             let moveDestSeq = new bt.Sequence();
 
             let hasMoveDest = new bt.IsTrue();
@@ -129,21 +95,21 @@ export class EnemyController extends Component {
             moveDestSeq.addChild(moveDest);
 
             rootNode.addChild(moveDestSeq);
-
         }
 
-        //set move dest when skill 0 is invalid 
         if (1) {
-            let setmoveDestSeq = new bt.Sequence();
-            rootNode.addChild(setmoveDestSeq);
+            let emitSeq = new bt.Sequence();
 
-            let inv = new bt.InvertResultDecorator();
-            let skill = new IsUseSkill();
-            inv.child = skill;
-            setmoveDestSeq.addChild(inv);
+            let simpleEmitter = this.node.getComponentInChildren(SimpleEmitter);
+            let cooldown = new IsCooldown();
+            cooldown.emitter = simpleEmitter;
+            emitSeq.addChild(cooldown);
 
-            let setmoveDest = new SetMoveDest();
-            setmoveDestSeq.addChild(setmoveDest);
+            let emit = new Emit();
+            emit.emitter = simpleEmitter;
+            emitSeq.addChild(emit);
+
+            rootNode.addChild(emitSeq);
         }
 
         if (0) {
@@ -168,27 +134,14 @@ export class EnemyController extends Component {
         }
 
         // wait for nothing 
+        let idleSeq = new bt.Sequence();
+        rootNode.addChild(idleSeq);
 
+        idleSeq.addChild(new StayIdle());
         let wait = new bt.Wait();
-        wait.interval = 1.0;
-        rootNode.addChild(wait);
-    }
-
-    initSkills() {
-        let skills = this.actor.skillMgr.skills;
-
-        let sk1 = new skill.RangeSkill(this.actor.skillMgr);
-        sk1.define = {
-            id: 1,
-            type: skill.Type.Range,
-            cooldown: 10,
-            duration: 1.0,
-            emitterPath: "Animaiton/Emitter4Dir",
-            castBuff: [],
-            hitBuff: [],
-        }
-
-        skills.push(sk1);
+        wait.elapsed = 1.0;
+        idleSeq.addChild(wait);
+        idleSeq.addChild(new SetMoveDest());        
     }
 }
 

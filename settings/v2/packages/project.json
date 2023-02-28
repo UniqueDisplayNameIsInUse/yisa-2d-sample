@@ -22,9 +22,16 @@
     ],
     "collisionMatrix": {
       "0": 15,
-      "1": 13,
-      "2": 11,
+      "1": 9,
+      "2": 9,
       "3": 7
     }
-  }
+  },
+  "__version__": "1.0.4",
+  "fbx": {
+    "legacyFbxImporter": {
+      "visible": true
+    }
+  },
+  "custom_joint_texture_layouts": []
 }

@@ -9,7 +9,7 @@ export class Dash extends ActorState {
     dashVelocity: Vec2 = v2();
 
     onEnter() {
-        const speed = this.actor.actorProperty.linearSpeed * this.dashFactor;
+        const speed = this.actor.linearSpeed * this.dashFactor;
         this.dashVelocity.x = this.actor.input.x
         this.dashVelocity.y = this.actor.input.y
         this.dashVelocity.normalize();
