@@ -7,9 +7,7 @@ export class Die extends ActorState {
 
     onEnter(): void {
         this.actor.rigidbody.linearVelocity = Vec2.ZERO;
-        let hasIdle = this.animation.getState(StateDefine.Die);
-        if (hasIdle)
-            this.animation.play(StateDefine.Die);
+        this.animation.play(StateDefine.Die);           
 
         this.animation.once(Animation.EventType.FINISHED, this.onDieEnd, this)
 

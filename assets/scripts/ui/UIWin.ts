@@ -4,7 +4,7 @@ const { ccclass, property, requireComponent } = _decorator;
 @ccclass("UIWin")
 export class UIWin extends Component {    
 
-    onBtnRetryClicked() {
+    onBtnRetryClicked() {        
         director.loadScene("game");
     }
 }

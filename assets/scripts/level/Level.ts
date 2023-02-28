@@ -1,4 +1,4 @@
-import { CCFloat, CCInteger, Component, Label, Node, Prefab, _decorator, assert, director, instantiate } from "cc";
+import { CCFloat, CCInteger, Component, Label, Node, Prefab, _decorator, assert, director, instantiate, screen, sys } from "cc";
 import { Actor } from "../actor/Actor";
 import { PlayerController } from "../actor/PlayerController";
 import { GameEvent } from "../event/GameEvent";
@@ -54,6 +54,9 @@ export class Level extends Component {
     start() {
         assert(Level.instance == null);
         Level.instance = this;
+        if(sys.platform == sys.Platform.MOBILE_BROWSER ){
+            screen.requestFullScreen();        
+        }        
 
         for (let sp of this.spawnPoints) {
             this.totalCount += sp.repeatCount + 1;
@@ -66,7 +69,7 @@ export class Level extends Component {
         this.statictics.string = `${this.killedCount}/${this.totalCount}`;
     }
 
-    onDestory() {
+    onDestroy() {
         Level.instance = null;
         director.off(GameEvent.OnDie, this.onActorDead, this);
     }
