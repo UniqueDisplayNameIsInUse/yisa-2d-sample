@@ -55,7 +55,8 @@ export class SubMachine<TKey> implements IMachine<TKey>, IState<TKey>, ITransita
     }
 
     onDestory(): void {
-
+        this.currState = null;
+        this.states.clear();
     }
 
     canTransit(to: TKey): boolean {

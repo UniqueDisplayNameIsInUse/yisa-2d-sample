@@ -1,5 +1,5 @@
 import { _decorator, Component, RigidBody2D, CircleCollider2D, Animation, Collider2D, Sprite, Vec2, v2, math, Vec3, Color, Quat, CCFloat, Contact2DType, IPhysics2DContact, v3, director } from 'cc';
-import { StateManager } from '../fsm/StateMachine';
+import { StateMachine } from '../fsm/StateMachine';
 import { StateDefine } from './StateDefine';
 import { mathutil } from '../util/MathUtil';
 import { colliderTag } from './ColliderTags';
@@ -17,7 +17,7 @@ export class Actor extends Component {
 
     collider: Collider2D | null = null;
 
-    stateMgr: StateManager<StateDefine> = new StateManager();
+    stateMgr: StateMachine<StateDefine> = new StateMachine();
 
     @property(Animation)
     animation: Animation = null;

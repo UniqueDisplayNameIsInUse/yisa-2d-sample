@@ -1,7 +1,7 @@
 import { _decorator } from 'cc';
 import { IState, SubMachine } from './State';
 
-export class StateManager<TKey> {
+export class StateMachine<TKey> {
 
     mainMachine: SubMachine<TKey> = new SubMachine();
 

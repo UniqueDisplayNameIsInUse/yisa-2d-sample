@@ -1,5 +1,4 @@
 import { CCFloat, CCInteger, Component, Label, Node, Prefab, _decorator, assert, director, instantiate, screen, sys } from "cc";
-import { Actor } from "../actor/Actor";
 import { PlayerController } from "../actor/PlayerController";
 import { GameEvent } from "../event/GameEvent";
 const { ccclass, property, requireComponent } = _decorator;

@@ -22,12 +22,12 @@ export class HPBar extends Component {
         if (!PlayerController.instance || !PlayerController.instance.actor) {
             return;
         }
-        let hp = PlayerController.instance.actor.hp;
-        let maxHp = PlayerController.instance.actor.maxHp;
-        let div = maxHp / HEART_RATIO;
-        let maxHeart = Math.ceil(div);
-        let p = hp % HEART_RATIO / HEART_RATIO;
-        let f = Math.floor(hp / HEART_RATIO);
+        const hp = PlayerController.instance.actor.hp;
+        const maxHp = PlayerController.instance.actor.maxHp;
+        const div = maxHp / HEART_RATIO;
+        const maxHeart = Math.ceil(div);
+        const percent = hp % HEART_RATIO / HEART_RATIO;
+        const flr = Math.floor(hp / HEART_RATIO);
 
         let curr = this.layout.node.children.length;
 
@@ -47,10 +47,10 @@ export class HPBar extends Component {
 
         for (let i = 0; i < child.length; i++) {
             let childRenderer = child[i].getChildByName("HP").getComponent(Sprite);
-            if (i < f)
+            if (i < flr)
                 childRenderer.fillRange = 1;
-            else if (i == f)
-                childRenderer.fillRange = p;
+            else if (i == flr)
+                childRenderer.fillRange = percent;
             else
                 childRenderer.fillRange = 0;
         }
