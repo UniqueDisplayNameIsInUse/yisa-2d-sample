@@ -22,4 +22,4 @@ export class UIInput extends Component {
         director.emit(GameEvent.OnFireButtonClicked, AimDirection.DOWN);
     }
     
-}
+} 

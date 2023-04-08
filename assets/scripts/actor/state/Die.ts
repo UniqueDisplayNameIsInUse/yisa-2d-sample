@@ -27,6 +27,6 @@ export class Die extends ActorState {
     }
 
     canTransit(to: StateDefine): boolean {
-        return to != StateDefine.Die;
+        return false;
     }
 } 

@@ -23,12 +23,7 @@ export class SpawnPoint {
  * 关卡
  */
 @ccclass("Level")
-export class Level extends Component {
-
-    private static _instance: Level = null;
-
-    static get instance(): Level { return this._instance; };
-    private static set instance(value: Level) { this._instance = value; }
+export class Level extends Component {   
 
     @property([SpawnPoint])
     spawnPoints: Array<SpawnPoint> = [];
@@ -51,8 +46,6 @@ export class Level extends Component {
     totalEnemyCount: number = 0;
 
     start() {
-        assert(Level.instance == null);
-        Level.instance = this;
         if(sys.platform == sys.Platform.MOBILE_BROWSER ){
             screen.requestFullScreen();        
         }        
@@ -68,8 +61,7 @@ export class Level extends Component {
         this.statictics.string = `${this.killedCount}/${this.totalCount}`;
     }
 
-    onDestroy() {
-        Level.instance = null;
+    onDestroy() {     
         director.off(GameEvent.OnDie, this.onActorDead, this);
     }
 

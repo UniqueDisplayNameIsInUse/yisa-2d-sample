@@ -1,7 +1,7 @@
 import { _decorator, Component, math, v3 } from 'cc';
 import { Actor } from './Actor';
 import { bt } from '../bt/BehaviourTree';
-import { Chase, EscapeDash, HasTarget, IsLowHp, IsInAttackRange, MoveToDest, Emit, IsCooldown, SetMoveDest, StayIdle } from './ai/BehaviourTree';
+import { EscapeDash, IsLowHp, MoveToDest, Emit, IsCooldown, SetMoveDest, StayIdle } from './ai/BehaviourTree';
 import { BlackboardKey } from './ai/BlackboardKey';
 import { Idle } from './state/Idle';
 import { StateDefine } from './StateDefine';
@@ -19,7 +19,7 @@ export class EnemyController extends Component {
 
     ai: bt.BehaviourTree = null;
 
-    attackRange: number = 50;
+    //attackRange: number = 50;
 
     start() {
         this.actor = this.node.getComponent(Actor);
@@ -42,7 +42,7 @@ export class EnemyController extends Component {
     initBlackboard() {
         this.ai.setData(BlackboardKey.Escaped, false);
         this.ai.setData(BlackboardKey.Actor, this.actor);
-        this.ai.setData(BlackboardKey.AttackRange, this.attackRange);
+        //this.ai.setData(BlackboardKey.AttackRange, this.attackRange);
 
         this.randomNextMoveDest();
     }
@@ -112,26 +112,26 @@ export class EnemyController extends Component {
             rootNode.addChild(emitSeq);
         }
 
-        if (0) {
-            // chase 
-            let chaseSeq = new bt.Sequence();
-            rootNode.addChild(chaseSeq);
+        // if (0) {
+        //     // chase 
+        //     let chaseSeq = new bt.Sequence();
+        //     rootNode.addChild(chaseSeq);
 
-            let hasTarget = new HasTarget();
+        //     let hasTarget = new HasTarget();
 
-            // has target ?
-            chaseSeq.addChild(hasTarget);
+        //     // has target ?
+        //     chaseSeq.addChild(hasTarget);
 
-            // is in attack range?
-            let invInRange = new bt.InvertResultDecorator();
-            let isInAttackRange = new IsInAttackRange();
-            invInRange.child = isInAttackRange;
-            chaseSeq.addChild(invInRange);
+        //     // is in attack range?
+        //     let invInRange = new bt.InvertResultDecorator();
+        //     let isInAttackRange = new IsInAttackRange();
+        //     invInRange.child = isInAttackRange;
+        //     chaseSeq.addChild(invInRange);
 
-            // chase 
-            let chase = new Chase();
-            chaseSeq.addChild(chase);
-        }
+        //     // chase 
+        //     let chase = new Chase();
+        //     chaseSeq.addChild(chase);
+        // }
 
         // wait for nothing 
         let idleSeq = new bt.Sequence();

@@ -37,11 +37,11 @@ export class HPBar extends Component {
             curr++;
         }
 
-        while (curr > maxHeart) {
-            let lastHeart = this.layout.node.children[this.layout.node.children.length - 1];
-            this.layout.node.removeChild(lastHeart);
-            curr--;
-        }
+        // while (curr > maxHeart) {
+        //     let lastHeart = this.layout.node.children[this.layout.node.children.length - 1];
+        //     this.layout.node.removeChild(lastHeart);
+        //     curr--;
+        // }
 
         let child = this.layout.node.children;
 

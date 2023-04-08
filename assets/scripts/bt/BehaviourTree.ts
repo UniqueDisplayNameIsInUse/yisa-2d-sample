@@ -26,6 +26,16 @@ export namespace bt {
 
     }
 
+    /**
+   * AI 的黑板     
+   */
+    export interface Blackboard {
+        has(name: string): boolean;
+        set(name: string, val: any);
+        get(name: string): any;
+        delete(name: string);
+    }
+
     export function markFail(result: ExecuteResult) {
         result.executeState = ExecuteState.Fail;
     }
@@ -52,25 +62,18 @@ export namespace bt {
     export interface BtNode {
         execute(dt: number, result: ExecuteResult);
     }
-
-    /**
-     * 执行节点
-     */
-    export abstract class ExecutionNode implements BtNode {
-        abstract execute(dt: number, result: ExecuteResult);
-    }
-
+   
     /**
      * 动作节点
      */
-    export abstract class Action implements ExecutionNode {
+    export abstract class Action implements BtNode {
         abstract execute(dt: number, result: ExecuteResult);
     }
 
     /**
      * 条件节点
      */
-    export abstract class Condition implements ExecutionNode {
+    export abstract class Condition implements BtNode {
         abstract isSatisfy(result: ExecuteResult): boolean;
         execute(dt: number, result: ExecuteResult) {
             result.executeState = this.isSatisfy(result) ? ExecuteState.Success : ExecuteState.Fail;
@@ -80,7 +83,7 @@ export namespace bt {
     /**
      * 控制节点
      */
-    export abstract class ControllNode implements BtNode {
+    export abstract class ControlNode implements BtNode {
         children: Array<BtNode> = [];
         abstract execute(dt: number, result: ExecuteResult);
         addChild(child: BtNode) {
@@ -92,7 +95,7 @@ export namespace bt {
      * Sequence
      * 所有执行完毕
      */
-    export class Sequence extends ControllNode {
+    export class Sequence extends ControlNode {
         execute(dt: number, result: ExecuteResult) {
             markFail(result);
             for (let child of this.children) {
@@ -101,7 +104,6 @@ export namespace bt {
                     break;
                 }
             }
-            return result;
         }
     }
 
@@ -109,7 +111,7 @@ export namespace bt {
      * Fallback 
      * 任意一个子节点执行成功或者所有子节点都执行失败
      */
-    export class Fallback extends ControllNode {
+    export class Fallback extends ControlNode {
         execute(dt: number, result: ExecuteResult) {
             markFail(result);
             for (let child of this.children) {
@@ -118,7 +120,6 @@ export namespace bt {
                     break;
                 }
             }
-            return result;
         }
     }
 
@@ -126,7 +127,7 @@ export namespace bt {
      * Parallel
      * 返回一定数量[0, children.length]成功的则成功
      */
-    export class Parallel extends ControllNode {
+    export class Parallel extends ControlNode {
         mustSuccessCount: number = 1;
         execute(dt: number, result: ExecuteResult) {
             markFail(result);
@@ -159,7 +160,7 @@ export namespace bt {
     /**
      * 随机选择器
      */
-    export class RandomSelector extends ControllNode {
+    export class RandomSelector extends ControlNode {
         execute(dt: number, result: ExecuteResult) {
             markFail(result);
             let selectedChild = this.children[math.randomRangeInt(0, this.children.length)];
@@ -229,16 +230,6 @@ export namespace bt {
         key: string
     }
 
-
-    /**
-     * AI 的黑板     
-     */
-    export interface Blackboard {
-        has(name: string): boolean;
-        set(name: string, val: any);
-        get(name: string): any;
-        delete(name: string);
-    }
 
     /**
      * 行为树

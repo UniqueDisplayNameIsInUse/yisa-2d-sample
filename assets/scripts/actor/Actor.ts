@@ -1,10 +1,9 @@
-import { _decorator, Component, RigidBody2D, CircleCollider2D, Animation, Collider2D, Sprite, Vec2, v2, math, Vec3, Color, Quat, CCFloat, Contact2DType, IPhysics2DContact, v3, director } from 'cc';
+import { _decorator, Component, RigidBody2D, CircleCollider2D, Animation, Collider2D, Sprite, Vec2, v2, math, Color, Quat, CCFloat, Contact2DType, IPhysics2DContact, v3 } from 'cc';
 import { StateMachine } from '../fsm/StateMachine';
 import { StateDefine } from './StateDefine';
 import { mathutil } from '../util/MathUtil';
 import { colliderTag } from './ColliderTags';
 import { Projectile } from './projectile/Projectile';
-import { GameEvent } from '../event/GameEvent';
 const { ccclass, property, requireComponent, disallowMultiple } = _decorator;
 
 @ccclass('Actor')

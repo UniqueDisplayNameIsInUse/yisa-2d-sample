@@ -3,7 +3,6 @@ import { Actor } from './Actor';
 import { Idle } from './state/Idle';
 import { Run } from './state/Run';
 import { StateDefine } from './StateDefine';
-import { Dash } from './state/Dash';
 import { SimpleEmitter } from './projectile/SimpleEmitter';
 import { VirtualInput } from '../inputs/VirtualInput';
 import { AimDirection } from './AimDirection';

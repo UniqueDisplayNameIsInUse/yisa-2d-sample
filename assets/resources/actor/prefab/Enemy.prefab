@@ -426,7 +426,7 @@
       "__expectedType__": "cc.Prefab"
     },
     "startLinearSpeed": 5,
-    "startAngularVelocity": 10,
+    "startAngularSpeed": 20,
     "_id": ""
   },
   {

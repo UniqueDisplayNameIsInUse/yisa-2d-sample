@@ -11,43 +11,43 @@ import { SimpleEmitter } from "../projectile/SimpleEmitter";
 /**
  * Chase target
  */
-export class Chase extends bt.Action {
+// export class Chase extends bt.Action {
 
-    execute(dt: number, result: bt.ExecuteResult) {
-        let actor: Actor = result.blackboard.get(BlackboardKey.Actor);
-        let target: Actor = result.blackboard.get(BlackboardKey.Target);
-        if (!actor || !target) {
-            bt.markFail(result);
-            return;
-        }
+//     execute(dt: number, result: bt.ExecuteResult) {
+//         let actor: Actor = result.blackboard.get(BlackboardKey.Actor);
+//         let target: Actor = result.blackboard.get(BlackboardKey.Target);
+//         if (!actor || !target) {
+//             bt.markFail(result);
+//             return;
+//         }
 
-        let attackRange = result.blackboard.get(BlackboardKey.AttackRange);
-        let dir = v3();
-        Vec3.subtract(dir, target.node.worldPosition, actor.node.worldPosition);
-        let len = dir.length();
+//         let attackRange = result.blackboard.get(BlackboardKey.AttackRange);
+//         let dir = v3();
+//         Vec3.subtract(dir, target.node.worldPosition, actor.node.worldPosition);
+//         let len = dir.length();
 
-        let aabbActor = actor.collider.worldAABB;
-        let aabbTarget = target.collider.worldAABB;
+//         let aabbActor = actor.collider.worldAABB;
+//         let aabbTarget = target.collider.worldAABB;
 
-        let maxRadiusA = Math.max(aabbActor.size.x, aabbActor.size.y);
-        let maxRadiusT = Math.max(aabbTarget.size.x, aabbTarget.size.y);
-        let totalRadius = maxRadiusA + maxRadiusT;
-        totalRadius *= 0.5;
+//         let maxRadiusA = Math.max(aabbActor.size.x, aabbActor.size.y);
+//         let maxRadiusT = Math.max(aabbTarget.size.x, aabbTarget.size.y);
+//         let totalRadius = maxRadiusA + maxRadiusT;
+//         totalRadius *= 0.5;
 
-        if (len - totalRadius < attackRange) {
-            bt.markSuccess(result);
-            actor.stateMgr.transit(StateDefine.Idle);
-            return;
-        }
+//         if (len - totalRadius < attackRange) {
+//             bt.markSuccess(result);
+//             actor.stateMgr.transit(StateDefine.Idle);
+//             return;
+//         }
 
-        dir.normalize();
+//         dir.normalize();
 
-        actor.input.set(dir.x, dir.y);
-        actor.stateMgr.transit(StateDefine.Run);
-        bt.markRunning(result);
-    }
+//         actor.input.set(dir.x, dir.y);
+//         actor.stateMgr.transit(StateDefine.Run);
+//         bt.markRunning(result);
+//     }
 
-}
+// }
 
 export class MoveToDest extends bt.Action {
     execute(dt: number, result: bt.ExecuteResult) {
@@ -151,11 +151,11 @@ export class EscapeDash extends bt.Action {
 /**
  * add buff
  */
-export class Rage extends bt.Action {
-    execute(dt: number, result: bt.ExecuteResult) {
-        bt.markFail(result);
-    }
-}
+// export class Rage extends bt.Action {
+//     execute(dt: number, result: bt.ExecuteResult) {
+//         bt.markFail(result);
+//     }
+// }
 
 //#endregion AI actions
 
@@ -164,11 +164,11 @@ export class Rage extends bt.Action {
 /**
  * Check if the AI has a target
  */
-export class HasTarget extends bt.Condition {
-    isSatisfy(result: bt.ExecuteResult): boolean {
-        return result.blackboard.has(BlackboardKey.Target)
-    }
-}
+// export class HasTarget extends bt.Condition {
+//     isSatisfy(result: bt.ExecuteResult): boolean {
+//         return result.blackboard.has(BlackboardKey.Target)
+//     }
+// }
 
 export class IsCooldown extends bt.Condition {
     emitter: SimpleEmitter = null;
@@ -221,17 +221,17 @@ export class StayIdle extends bt.Action {
 /**
  * Check if target is in attack range
  */
-export class IsInAttackRange extends bt.Condition {
-    isSatisfy(result: bt.ExecuteResult): boolean {
-        let actor = result.blackboard.get(BlackboardKey.Actor) as Actor;
-        let target = result.blackboard.get(BlackboardKey.Target) as Actor;
-        let attackRange = result.blackboard.get(BlackboardKey.AttackRange);
-        if (actor && target) {
-            return Vec3.distance(actor.node.worldPosition, target.node.worldPosition) < attackRange;
-        }
-        return  // && target is in attack range
-    }
-}
+// export class IsInAttackRange extends bt.Condition {
+//     isSatisfy(result: bt.ExecuteResult): boolean {
+//         let actor = result.blackboard.get(BlackboardKey.Actor) as Actor;
+//         let target = result.blackboard.get(BlackboardKey.Target) as Actor;
+//         let attackRange = result.blackboard.get(BlackboardKey.AttackRange);
+//         if (actor && target) {
+//             return Vec3.distance(actor.node.worldPosition, target.node.worldPosition) < attackRange;
+//         }
+//         return  // && target is in attack range
+//     }
+// }
 
 /**
  * Check is half Hp or less

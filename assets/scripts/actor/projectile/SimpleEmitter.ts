@@ -3,10 +3,6 @@ import { Projectile } from "./Projectile";
 import { Actor } from "../Actor";
 const { ccclass, property } = _decorator;
 
-export enum ProjectileEventType {
-    onProjectileDead = 'onProjectileDead',
-}
-
 @ccclass('SimpleEmitter')
 export class SimpleEmitter extends Component {
 
@@ -20,28 +16,21 @@ export class SimpleEmitter extends Component {
     startLinearSpeed: number = 0;
 
     @property(CCFloat)
-    startAngularVelocity: number = 20;
+    startAngularSpeed: number = 20;
 
-    actor: Actor = null;
-
-    projectilePool: Pool<Node> | null = null;
+    actor: Actor = null;    
 
     cooldown: number = 5;
 
     castTime: number = 0;
 
-    start() {
-        this.projectilePool = new Pool((): Node => {
-            let n = instantiate(this.projectilePrefab!);
-            n.active = false;
-            return n;
-        }, 10, (n: Node) => {
-            n.destroy();
-        });
+    canvasNode: Node = null;
+
+    start() {        
+        this.canvasNode = find('LevelCanvas');
     }
 
-    onDestroy() {
-        this.projectilePool.destroy();
+    onDestroy() {     
     }
 
     get isCoolingdown(): boolean {
@@ -56,10 +45,10 @@ export class SimpleEmitter extends Component {
                 continue;
             }
             let wr = emitNode.worldRotation;
-            let node = this.projectilePool.alloc();//instantiate(this.projectilePrefab);
+            let node = instantiate(this.projectilePrefab);
             node.active = true;
 
-            find('LevelCanvas').addChild(node);
+            this.canvasNode.addChild(node);
 
             let left = Vec3.UNIT_X;
             let velocityV3 = v3();
@@ -72,19 +61,12 @@ export class SimpleEmitter extends Component {
             velocity.multiplyScalar(this.startLinearSpeed);
 
             rigid.linearVelocity = velocity;
-            rigid.angularVelocity = this.startAngularVelocity;
+            rigid.angularVelocity = this.startAngularSpeed;
 
             node.worldPosition = emitNode.worldPosition;
 
             let projectile = node.getComponent(Projectile);
-            projectile.host = this.actor;
-
-            node.once(ProjectileEventType.onProjectileDead, this.onProjectileDead, this);
+            projectile.host = this.actor;            
         }
-    }
-
-    onProjectileDead(n: Node) {
-        n.active = false;
-        this.projectilePool.free(n);
     }
 }

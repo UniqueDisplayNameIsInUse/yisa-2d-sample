@@ -19,8 +19,6 @@ export class Projectile extends Component {
 
     host: Actor | null = null;
 
-    markDelete: boolean = false;
-
     start() {
         this.collider = this.node.getComponent(Collider2D);
         this.rigidbody = this.node.getComponent(RigidBody2D);
@@ -32,17 +30,13 @@ export class Projectile extends Component {
         this.collider.off(Contact2DType.BEGIN_CONTACT, this.onCollisionBegin, this);
     }
 
-    onCollisionBegin(a: Collider2D, b: Collider2D, contact: IPhysics2DContact) {
-        if (colliderTag.isScene(b.tag) || colliderTag.isProjectileHitable(a.tag, b.tag)) {
-            a.enabled = false;
-            this.markDelete = true;
-
-        }
-    }
-
-    update(dt: number) {
-        if (this.markDelete) {
-            this.node.destroy();
+    onCollisionBegin(self: Collider2D, other: Collider2D, contact: IPhysics2DContact) {
+        if (colliderTag.isScene(other.tag) || colliderTag.isProjectileHitable(self.tag, other.tag)) {
+            self.enabled = false;            
+            
+            this.schedule(()=>{
+                this.node.destroy();
+            })
         }
     }
 }

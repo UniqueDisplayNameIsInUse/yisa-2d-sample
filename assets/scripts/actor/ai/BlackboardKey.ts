@@ -28,5 +28,5 @@ export enum BlackboardKey {
     Escaped = 'escaped',
 
     // number
-    AttackRange = 'attackRange',
+    //AttackRange = 'attackRange',
 }   
